@@ -550,21 +550,24 @@ def main():
         name = product["name"]
         print('%s. %s' % (index + 1, name))
     # test locally using args.shortname = 'mojave'
+    shortnames = ', '.join(p['short'] for p in products)
     if not args.shortname or args.shortname == '':
         answer = input('\nChoose a product to download (1-%s): ' % len(products))
         try:
             index = int(answer) - 1
-            if index < 0:
+            if not 0 <= index < len(products):
                 raise ValueError
-        except (ValueError, IndexError):
-            pass
+        except ValueError:
+            print('ERROR: Enter a number between 1 and %s.' % len(products))
+            return 1
     else:
-        index = 0
-        for product in products:
+        for index, product in enumerate(products):
             if args.shortname == product['short']:
                 break
-            else:
-                index = index+1
+        else:
+            print('ERROR: Unknown shortname %r. Valid shortnames are: %s'
+                  % (args.shortname, shortnames))
+            return 1
     product = products[index]
     try:
         os_type = product["os_type"]
