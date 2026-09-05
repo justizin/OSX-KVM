@@ -63,6 +63,15 @@ args=(
   -netdev user,id=net0,hostfwd=tcp::2222-:22 -device virtio-net-pci,netdev=net0,id=net0,mac=52:54:00:c9:18:27
   # -netdev user,id=net0 -device vmxnet3,netdev=net0,id=net0,mac=52:54:00:c9:18:27  # Note: Use this line for High Sierra
   -monitor stdio
+  # For scripted / headless use, replace `-monitor stdio` above with sockets:
+  #   -monitor unix:/tmp/osx-kvm-mon.sock,server,nowait
+  #   -qmp unix:/tmp/osx-kvm-qmp.sock,server,nowait
+  # QMP is required to drive the GUI: `-device usb-tablet` is an *absolute*
+  # pointer, and HMP's `mouse_move` only emits relative events, which it
+  # ignores. Use QMP `input-send-event` with `abs` axes scaled to 0..32767.
+  # `screendump` (either monitor) gives you frames without a display.
+  # Note: the OpenCore picker itself ignores tablet input -- drive it with
+  # `sendkey` / QMP key events, and switch to the mouse once macOS is up.
   -device vmware-svga
   # -spice port=5900,addr=127.0.0.1,disable-ticketing=on
 )
