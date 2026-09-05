@@ -1,8 +1,14 @@
 ### macOS Sonoma support
 
-- Change `Penryn` to `Haswell-noTSX` in OpenCore-Boot.sh file.
+- No changes to `OpenCore-Boot.sh` are needed. The default (active) `-cpu`
+  line is already `Skylake-Client`, which Sonoma is happy with.
 
-- This worked fine even on a `AMD Ryzen 9 5900HS` CPU.
+- Ignore any older advice to "change `Penryn` to `Haswell-noTSX`" -- it
+  predates the switch to `Skylake-Client`, and `Penryn` is now the
+  commented-out line.
+
+- This worked fine even on a `AMD Ryzen 9 5900HS` CPU, and on an Intel
+  Core i7-9750H (Coffee Lake).
 
 ### App Store problems
 

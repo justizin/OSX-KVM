@@ -13,15 +13,26 @@
 # NOTE: Tweak the "MY_OPTIONS" line in case you are having booting problems!
 ###############################################################################
 #
-# Change `Penryn` to `Haswell-noTSX` in OpenCore-Boot.sh file for macOS Sonoma!
+# CPU model: the *active* `-cpu` line below uses `Skylake-Client`, which is what
+# recent macOS releases want. The `Penryn` line is kept, commented out, for the
+# older releases it was needed for.
+#
+#   High Sierra .. Monterey   ->  Penryn         (enable the commented line)
+#   Ventura and newer         ->  Skylake-Client (the default, active line)
+#
+# Older advice to "change Penryn to Haswell-noTSX for Sonoma" predates the
+# switch to Skylake-Client and no longer describes this file -- `Penryn` is
+# already the disabled line, so there is nothing to change for Sonoma.
 #
 ###############################################################################
 
 
 MY_OPTIONS="+ssse3,+sse4.2,+popcnt,+avx,+aes,+xsave,+xsaveopt,check"
 
-# This script works for Big Sur, Catalina, Mojave, and High Sierra. Tested with
-# macOS 10.15.6, macOS 10.14.6, and macOS 10.13.6.
+# This script works for all recent macOS versions, not just the older ones it
+# was originally written for. Tested with macOS 10.13.6, 10.14.6, 10.15.6, and
+# with Sonoma 14.6.1 installed to completion on an Intel Core i7-9750H
+# (Coffee Lake) host using this default Skylake-Client line unmodified.
 
 ALLOCATED_RAM="4096" # MiB
 CPU_SOCKETS="1"
