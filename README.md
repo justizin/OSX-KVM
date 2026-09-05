@@ -63,11 +63,45 @@ processors work just fine (even for macOS Sonoma).
 
 * Install QEMU and other packages.
 
+  Debian / Ubuntu:
+
   ```
   sudo apt-get install qemu-system uml-utilities virt-manager git \
       wget libguestfs-tools p7zip-full make dmg2img tesseract-ocr \
       tesseract-ocr-eng genisoimage vim net-tools screen -y
   ```
+
+  Only two of the above are actually required to install macOS from the CLI:
+  a QEMU providing `qemu-system-x86_64`, and `dmg2img`. The rest cover
+  optional extras -- tap networking, the ISO scripts, the OCR helpers and
+  libvirt.
+
+  Arch (and derivatives). `dmg2img` lives in the AUR, so this needs an AUR
+  helper such as `yay`:
+
+  ```
+  yay -S --needed qemu-desktop dmg2img
+  ```
+
+  Optional extras on Arch: `7zip cdrtools tesseract tesseract-data-eng
+  virt-manager libvirt net-tools screen` from the repos, and `uml_utilities`
+  from the AUR.
+
+  Package names that differ from Debian/Ubuntu:
+
+  | Debian / Ubuntu | Arch |
+  |---|---|
+  | `qemu-system` | `qemu-desktop` (or `qemu-full`) |
+  | `dmg2img` | `dmg2img` (AUR) |
+  | `p7zip-full` | `7zip` (it provides/replaces the old `p7zip`) |
+  | `uml-utilities` | `uml_utilities` (AUR) |
+  | `genisoimage` | `cdrtools` |
+  | `tesseract-ocr`, `tesseract-ocr-eng` | `tesseract`, `tesseract-data-eng` |
+  | `libguestfs-tools` | no direct equivalent; not needed for a base install |
+
+  Note: you do **not** need an `edk2`/`ovmf` package on any distribution.
+  This repository ships its own `OVMF_CODE_4M.fd` and `OVMF_VARS-*.fd`, and
+  the boot scripts point at those.
 
   This step may need to be adapted for your Linux distribution.
 
