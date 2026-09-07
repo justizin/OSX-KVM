@@ -6,8 +6,8 @@
     "coordinator_host": "omarchiMac (planned; currently ugnomarchy)",
     "note": "Persistent services (mirror + dashboard) live on og128x01, the always-on Mac Pro. ugnomarchy is a laptop and must not be a hard dependency.",
     "tailnet": "hydra-hammerhead.ts.net",
-    "mirror_url": "http://og128x01.hydra-hammerhead.ts.net:8080",
-    "dashboard_url": "http://og128x01.hydra-hammerhead.ts.net:8090",
+    "mirror_url": "http://og128x01.hydra-hammerhead.ts.net/mirror",
+    "dashboard_url": "http://og128x01.hydra-hammerhead.ts.net",
     "worker_console_pattern": "each worker publishes VNC_HOST=<host>.hydra-hammerhead.ts.net so the projector browser reaches its console"
   },
   "hosts": {

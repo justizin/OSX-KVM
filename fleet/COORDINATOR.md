@@ -33,6 +33,6 @@ not be infrastructure):
     VM=<version> fleet/vmctl.py shot /tmp/s.png        # drive via QMP
     fleet/health.sh <version> 60                       # wedged vs idle vs healthy
     fleet/record.sh <version> &                        # frames + log (run under a watch)
-    DASHBOARD_URL=http://og128x01.hydra-hammerhead.ts.net:8090 fleet/dashboard/publish.sh <version> ...
+    DASHBOARD_URL=http://og128x01.hydra-hammerhead.ts.net fleet/dashboard/publish.sh <version> ...
 Stop at the FIRST Setup Assistant screen and cut the template (before any account).
 EULA (Agree) is a human gate on every install. Assign Ventura+ only to AVX2 hosts.

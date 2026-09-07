@@ -1,31 +1,43 @@
-# Deploying fleet services on og128x01 (Mac Pro, always-on: 128GB / 24c / 1TB)
+# Fleet services on og128x01 (Mac Pro, always-on: 128GB / 24c / 1TB)
 
-Prereqs on og128x01: docker + docker compose, git, this fork cloned to ~/OSX-KVM.
+One published port (**80**), path-routed by an nginx gateway:
+- `http://og128x01.hydra-hammerhead.ts.net/`         -> dashboard (add `?view=rotate` on the projector)
+- `http://og128x01.hydra-hammerhead.ts.net/mirror/`  -> recovery-image mirror
 
-## 1. Mirror data (self-contained; no dependency on any other host)
-    cd ~/OSX-KVM/fleet/mirror
-    OSX_KVM=~/OSX-KVM ./populate.sh ./data      # re-downloads ~6 GB from Apple
-    # (or seed once from another host: rsync -a otherhost:~/OSX-KVM/fleet/mirror/data/ ./data/)
+noVNC live consoles connect the browser directly to each worker's WebSocket port
+(not through :80), so workers must be reachable on the tailnet.
 
-## 2. Bring up both services
-    cd ~/OSX-KVM/fleet/deploy
+## Deploy
+    cd ~/OSX-KVM/fleet
+    # 1. mirror data (self-contained; ~6 GB, re-downloadable from Apple)
+    OSX_KVM=~/OSX-KVM mirror/populate.sh mirror/data
+    # 2. bring up gateway + dashboard
+    cd deploy
+    docker compose config        # validate
     docker compose up -d --build
-    #   mirror     -> http://<og128x01>:8080
-    #   dashboard  -> http://<og128x01>:8090   (open ?view=rotate on the projector)
+    curl -sS localhost/status.json            # dashboard alive
+    curl -sSI localhost/mirror/index.json     # mirror alive (Accept-Ranges: bytes)
 
-## 3. Point workers at og128x01 over Tailscale (survives the wired bridge)
-    export MACOS_RECOVERY_MIRROR=http://og128x01.hydra-hammerhead.ts.net:8080
-    export DASHBOARD_URL=http://og128x01.hydra-hammerhead.ts.net:8090
+## Point workers at it (Tailscale MagicDNS)
+    export MACOS_RECOVERY_MIRROR=http://og128x01.hydra-hammerhead.ts.net/mirror
+    export DASHBOARD_URL=http://og128x01.hydra-hammerhead.ts.net
+    export VNC_HOST=<this-worker>.hydra-hammerhead.ts.net   # so its console is reachable
+    # then: boot-macos.sh <version> --install --headless ; dashboard/publish.sh ...
 
-## Network resilience — the wired switch is bridged over an unreliable wifi extender
-- Tailscale already gives a direct, interface-agnostic path; keep it running.
-- Add a WiFi backup so Tailscale has a second physical path if the bridge drops:
-    nmcli device wifi list
+## Network resilience (wired switch bridged over an unreliable wifi extender)
+- Keep Tailscale up; it uses whatever interface is available.
+- Add a WiFi backup so Tailscale has a second physical path:
     nmcli device wifi connect "<SSID>" password "<pw>"
     nmcli connection modify "<SSID>" connection.autoconnect yes
-- Mac Pro WiFi (Broadcom) on Debian usually needs firmware. Identify + install:
-    lspci -nn | grep -i network
-    sudo apt-get install -y firmware-brcm80211    # some chips need broadcom-sta-dkms
-- Fleet transfers already tolerate a flaky link: fetch-macOS falls back to Apple
-  on a mirror miss, dashboard pushes are best-effort, and golden images should
-  move with rsync (resumable), never scp.
+- Mac Pro WiFi (Broadcom) on Debian usually needs firmware:
+    lspci -nn | grep -i network ; sudo apt-get install -y firmware-brcm80211
+- Transfers already tolerate a flaky link: nginx serves /mirror with byte ranges
+  (resumable), fetch-macOS falls back to Apple on a miss, dashboard pushes are
+  best-effort, and golden images should move with rsync, never scp.
+
+## Troubleshooting "can't reach the dashboard"
+    docker compose ps                 # both services Up?
+    docker compose logs gateway       # nginx errors?
+    ss -ltn | grep ':80 '             # gateway listening on the host?
+    # from another tailnet node:
+    curl -sS http://og128x01.hydra-hammerhead.ts.net/status.json
