@@ -1,0 +1,18 @@
+{
+  "host": "omarchiMac",
+  "probed_at": "2026-09-07T14:07:27-07:00",
+  "official": true,
+  "distro": "Omarchy",
+  "kernel": "7.1.9-arch1-2",
+  "cpu": {"model": "Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz", "vendor": "GenuineIntel", "cores": 4, "threads": 8,
+          "virt": "vmx", "avx2": true, "sse4_2": true},
+  "kvm": {"device": true, "rw": true, "ignore_msrs": "N"},
+  "qemu": {"path": "", "version": "", "meets_min": false},
+  "dmg2img": "",
+  "mem_gb": 31,
+  "disk_free_gb": 435,
+  "max_concurrent_vms": 2,
+  "eligible_versions": ["high-sierra","mojave","catalina","big-sur","monterey","ventura","sonoma","sequoia","tahoe"],
+  "reason_eligible": "AVX2 present -> all versions",
+  "blockers": ["qemu-system-x86_64 not installed","dmg2img not installed (AUR on Arch)","kvm ignore_msrs is 'N', needs 1/Y"]
+}
