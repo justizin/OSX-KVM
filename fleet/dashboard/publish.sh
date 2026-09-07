@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Push a VM's latest frame + state to the dashboard (runs on the worker host).
-#   DASHBOARD_URL=http://<og128x01>:8090 ./publish.sh <id> <host> <title> <state> <attn 0|1> "<sentence>"
+#   DASHBOARD_URL=http://og128x01.hydra-hammerhead.ts.net ./publish.sh <id> <host> <title> <state> <attn 0|1> "<sentence>"
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; FLEET="$(cd "$HERE/.." && pwd)"
 DASH="${DASHBOARD_URL:-http://og128x01.hydra-hammerhead.ts.net}"   # og128x01 over Tailscale by default

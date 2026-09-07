@@ -13,8 +13,8 @@ not be infrastructure):
    - fleet/docs/NOTES.md     findings + upstream PR branches
 
 ## Topology (2026-09-07)
-- og128x01  Mac Pro, 128GB/24c/1TB, always-on. SERVICES host: mirror :8080 +
-  dashboard :8090 (fleet/deploy). Heavy pre-Ventura parallel installs. Reached
+- og128x01  Mac Pro, 128GB/24c/1TB, always-on. SERVICES host: one gateway on :80
+  (dashboard at /, mirror at /mirror; fleet/deploy). Heavy pre-Ventura parallel installs. Reached
   over Tailscale og128x01.hydra-hammerhead.ts.net (+ wifi backup). No AVX2 -> Monterey and older only.
 - omarchiMac  i7-7700K, 31GB, AVX2. COORDINATOR + one AVX2 install at a time.
 - ugnomarchy  laptop. Disposable worker. NOT infrastructure.
