@@ -18,7 +18,7 @@
 
 MACOS_VERSIONS=(
   "high-sierra|High Sierra (10.13)|high-sierra|Penryn|vmxnet3|sse4_2"
-  "mojave|Mojave (10.14)|mojave|Penryn|virtio-net-pci|sse4_2"
+  "mojave|Mojave (10.14)|mojave|Penryn|vmxnet3|sse4_2"
   "catalina|Catalina (10.15)|catalina|Penryn|virtio-net-pci|sse4_2"
   "big-sur|Big Sur (11)|big-sur|Penryn|virtio-net-pci|sse4_2"
   "monterey|Monterey (12)|monterey|Penryn|virtio-net-pci|sse4_2"

@@ -85,8 +85,11 @@ args=(
   -machine q35
   -smp "$THREADS,cores=$CORES,sockets=1"
   -device qemu-xhci,id=xhci
-  -device usb-kbd,bus=xhci.0 -device usb-tablet,bus=xhci.0
   -device usb-ehci,id=ehci
+  # HID on the USB 2.0 (ehci) bus. Older macOS (Mojave and earlier) does not
+  # track a USB 3.0 (xhci) keyboard or tablet in the installer environment --
+  # the mouse and keyboard look dead. USB 2.0 HID is read by every version.
+  -device usb-kbd,bus=ehci.0 -device usb-tablet,bus=ehci.0
   -device isa-applesmc,osk="ourhardworkbythesewordsguardedpleasedontsteal(c)AppleComputerInc"
   -drive "if=pflash,format=raw,readonly=on,file=$OSX_KVM/OVMF_CODE_4M.fd"
   -drive "if=pflash,format=raw,file=$VM_DIR/OVMF_VARS.fd"
