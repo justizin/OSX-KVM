@@ -1,0 +1,7 @@
+services:
+  macos-mirror:
+    build: .
+    image: macos-recovery-mirror:local
+    ports: ["8080:80"]
+    volumes: ["${MIRROR_ROOT:-./data}:/srv/macos-recovery:ro"]
+    restart: unless-stopped

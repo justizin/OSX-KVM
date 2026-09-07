@@ -231,3 +231,25 @@ Consequences to know:
   Keyboard Access is on. Neither is a bug.
 
 Do not float, resize or fullscreen the operator's windows from a script.
+
+---
+
+## 9. Where to freeze the template (decided 2026-09-07)
+
+Freeze each version's golden image **at the first Setup Assistant screen**
+("Select Your Country or Region"), *before* any account exists. Clones then run
+Setup Assistant themselves and get their own account, hostname and identifiers.
+
+Procedure: when Setup Assistant appears, do NOT click anything. Shut the VM
+down cleanly from the host (`vmctl.py`/QMP `system_powerdown`, or just kill
+QEMU — the installer has already committed), then:
+
+    qemu-img convert -O qcow2 -c vms/<v>/mac_hdd_ng.img golden/<v>-template.qcow2
+
+A VM that has gone past account creation is a *workstation* image, not a
+template — keep it if useful, name it `<v>-workstation.qcow2`, but do not clone
+it to other hosts.
+
+Sonoma on the first host went past this point before the rule existed; its
+template will come from a second install (cheap now: recovery image is
+mirrored, the process is scripted).

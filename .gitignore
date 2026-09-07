@@ -14,3 +14,4 @@ OpenCore-Catalina/EFI/OC/Resources/
 # fleet tooling artifacts
 fleet/vms/
 fleet/golden/
+fleet/mirror/data/
