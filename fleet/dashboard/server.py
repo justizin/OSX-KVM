@@ -11,7 +11,7 @@ POST /remove/<id>      -> drop a VM (e.g. when it powers off)
 Workers on any host push here (see publish.sh). No dependency on the coordinator
 laptop -- this runs on the always-on server (og128x01).
 """
-import json, os, threading, datetime
+import json, os, threading, datetime, mimetypes
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 APP = os.path.dirname(os.path.abspath(__file__))
 DATA = os.environ.get("DASH_DATA", "/data")
@@ -43,6 +43,12 @@ class H(BaseHTTPRequestHandler):
             fp=os.path.join(DATA, os.path.basename(p))
             if os.path.isfile(fp): return self._s(200, open(fp,"rb").read(), "image/png")
             return self._s(404,b"no image")
+        if p.startswith("/novnc/") and ".." not in p:
+            fp=os.path.join(APP, p.lstrip("/"))
+            if os.path.isfile(fp):
+                ctype = "text/javascript" if fp.endswith(".js") else (mimetypes.guess_type(fp)[0] or "application/octet-stream")
+                return self._s(200, open(fp,"rb").read(), ctype)
+            return self._s(404,b"no file")
         return self._s(404,b"not found")
     def do_PUT(self):
         if self.path.startswith("/shot/"):
@@ -57,7 +63,8 @@ class H(BaseHTTPRequestHandler):
             now=datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
             e={"id":vid,"host":j.get("host",""),"title":j.get("title",vid),
                "state":j.get("state","idle"),"attention":bool(j.get("attention",False)),
-               "sentence":j.get("sentence",""),"img":vid+".png","updated":now}
+               "sentence":j.get("sentence",""),"img":vid+".png",
+               "vnc":j.get("vnc",""),"vnc_native":j.get("vnc_native",""),"updated":now}
             with LOCK:
                 d=load(); vms=[v for v in d.get("vms",[]) if v.get("id")!=vid]+[e]
                 vms.sort(key=lambda v:(0 if v["attention"] else 1, ORDER.get(v["state"],9), v["id"]))

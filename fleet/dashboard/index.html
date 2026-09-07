@@ -18,8 +18,7 @@
   #bar h1{font-size:20px;margin:0;font-weight:700;letter-spacing:.3px}
   #bar .sp{flex:1}
   #bar .stat{font-size:15px;color:var(--dim)}
-  #bar .attn{font-weight:700}
-  #bar .attn.on{color:var(--alert)}
+  #bar .attn.on{color:var(--alert);font-weight:700}
   #bar button{background:#1f262d;color:var(--ink);border:1px solid var(--edge);
     border-radius:8px;padding:8px 14px;font-size:15px;cursor:pointer}
   #bar button.active{background:var(--go);border-color:var(--go)}
@@ -28,7 +27,7 @@
   /* ---- tiled ---- */
   #grid{height:100%;display:grid;gap:14px;padding:14px}
   .tile{position:relative;background:#000;border:2px solid var(--edge);border-radius:12px;
-    overflow:hidden;display:flex;flex-direction:column;min-height:0}
+    overflow:hidden;display:flex;flex-direction:column;min-height:0;cursor:pointer}
   .tile .shot{flex:1;min-height:0;background:#000 center/contain no-repeat}
   .tile .cap{padding:10px 12px;background:var(--panel);border-top:1px solid var(--edge)}
   .tile .name{font-size:17px;font-weight:700}
@@ -39,6 +38,9 @@
     background:var(--go);box-shadow:0 0 0 3px rgba(0,0,0,.4)}
   .tile.state-done .dot{background:var(--ok)} .tile.state-run .dot{background:var(--go)}
   .tile.state-wait .dot{background:var(--warn)} .tile.state-idle .dot{background:var(--dim)}
+  .tile .live{position:absolute;bottom:64px;right:10px;background:rgba(0,0,0,.6);color:#fff;
+    font-size:12px;font-weight:700;padding:3px 8px;border-radius:5px;border:1px solid var(--edge)}
+  .tile:not(.hasvnc) .live{display:none}
   .tile.attn{border-color:var(--alert);box-shadow:0 0 0 4px var(--alert-glow),0 0 34px var(--alert-glow);
     animation:pulse 1.6s ease-in-out infinite}
   .tile.attn::after{content:"";position:absolute;inset:0;background:var(--alert-tint);pointer-events:none}
@@ -51,16 +53,19 @@
   /* ---- rotate ---- */
   #rot{height:100%;display:none;flex-direction:column;position:relative}
   #rot.show{display:flex}
-  #rot .shotwrap{flex:1;min-height:0;background:#000 center/contain no-repeat;margin:24px 24px 0}
-  #rot .panel{padding:20px 40px 34px;text-align:center}
-  #rot .rname{font-size:34px;font-weight:800}
-  #rot .rname .host{color:var(--dim);font-weight:600;font-size:26px}
-  #rot .rsent{font-size:clamp(28px,4.6vw,62px);font-weight:700;line-height:1.15;margin-top:10px}
-  #rot .rmeta{color:var(--dim);font-size:18px;margin-top:14px}
+  #rot .shotwrap{flex:1;min-height:0;background:#000 center/contain no-repeat;margin:24px 24px 0;cursor:pointer}
+  #rot .panel{padding:18px 40px 30px;text-align:center;position:relative}
+  #rot .rname{font-size:32px;font-weight:800}
+  #rot .rname .host{color:var(--dim);font-weight:600;font-size:24px}
+  #rot .rsent{font-size:clamp(26px,4.4vw,58px);font-weight:700;line-height:1.15;margin-top:8px}
+  #rot .rmeta{color:var(--dim);font-size:17px;margin-top:12px}
+  #rot .rlive{margin-top:14px;background:var(--go);color:#fff;border:none;border-radius:10px;
+    padding:12px 22px;font-size:19px;font-weight:700;cursor:pointer;display:none}
+  #rot.hasvnc .rlive{display:inline-block}
   #rot.attn{background:linear-gradient(180deg,rgba(255,59,48,.10),rgba(255,59,48,.22))}
   #rot.attn::before{content:"";position:absolute;inset:0;border:12px solid var(--alert);
     box-shadow:inset 0 0 90px var(--alert-glow);pointer-events:none;animation:pulse2 1.4s infinite}
-  #rot.attn .rsent{color:#fff}
+  #rot.attn .rsent{color:#fff} #rot.attn .rlive{background:var(--alert)}
   #rot .rbadge{display:none}
   #rot.attn .rbadge{display:inline-block;background:var(--alert);color:#fff;font-weight:800;
     font-size:22px;letter-spacing:1px;padding:8px 20px;border-radius:10px;margin-bottom:12px}
@@ -69,6 +74,24 @@
   #dots i{width:10px;height:10px;border-radius:50%;background:#333;display:block}
   #dots i.cur{background:var(--ink)} #dots i.a{background:var(--alert)}
   #empty{display:flex;height:100%;align-items:center;justify-content:center;color:var(--dim);font-size:24px}
+
+  /* ---- vnc overlay ---- */
+  #vnc{position:fixed;inset:0;background:#000;z-index:50;display:none;flex-direction:column}
+  #vnc.show{display:flex}
+  #vnc .vbar{display:flex;align-items:center;gap:16px;padding:10px 18px;background:var(--panel);
+    border-bottom:1px solid var(--edge)}
+  #vnc .vname{font-size:19px;font-weight:700}
+  #vnc .vname .host{color:var(--dim);font-weight:500}
+  #vnc .vstat{color:var(--dim);font-size:14px}
+  #vnc .vstat.conn{color:var(--ok)} #vnc .vstat.err{color:var(--alert)}
+  #vnc a.native{color:var(--go);font-size:14px;text-decoration:none}
+  #vnc .vclose{margin-left:auto;background:#1f262d;color:var(--ink);border:1px solid var(--edge);
+    border-radius:8px;padding:8px 16px;font-size:15px;cursor:pointer}
+  #vncScreen{flex:1;min-height:0;background:#000}
+  #vncScreen canvas{display:block;margin:auto}
+  #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1f262d;
+    border:1px solid var(--edge);color:var(--ink);padding:12px 20px;border-radius:10px;
+    font-size:16px;z-index:60;display:none}
 </style>
 </head>
 <body>
@@ -90,45 +113,61 @@
         <div class="rname" id="rName"></div>
         <div class="rsent" id="rSent"></div>
         <div class="rmeta" id="rMeta"></div>
+        <button class="rlive" id="rLive">🔍 Live console</button>
       </div>
       <div id="dots"></div>
     </div>
     <div id="empty" hidden>No active VMs reported yet.</div>
   </div>
-<script>
+  <div id="vnc">
+    <div class="vbar">
+      <span class="vname" id="vName"></span>
+      <span class="vstat" id="vStat">connecting…</span>
+      <a class="native" id="vNative" href="#" title="open in a native VNC viewer">vnc://</a>
+      <button class="vclose" id="vClose">Close (Esc)</button>
+    </div>
+    <div id="vncScreen"></div>
+  </div>
+  <div id="toast"></div>
+<script type="module">
+import RFB from './novnc/core/rfb.js';
 const POLL=3000, IMG=4000, ROT=8000, ROT_ATTN=14000;
-let data={vms:[]}, mode="tile", idx=0, rotTimer=null, imgv=Date.now();
+let data={vms:[]}, mode="tile", idx=0, rotTimer=null, imgv=Date.now(), rfb=null, prevMode="tile";
 const $=s=>document.querySelector(s);
+const byId=id=>(data.vms||[]).find(v=>v.id===id);
 const stateClass=s=>({installing:"state-run",booting:"state-run",done:"state-done",
   ready:"state-done",waiting:"state-wait",idle:"state-idle"}[s]||"state-run");
+const esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function timeAgo(iso){const t=Date.parse(iso);if(isNaN(t))return iso;
+  const s=Math.max(0,(Date.now()-t)/1000|0);
+  return s<60?s+"s ago":(s<3600?(s/60|0)+"m ago":(s/3600|0)+"h ago");}
+function toast(m){const t=$("#toast");t.textContent=m;t.style.display="block";
+  clearTimeout(toast._t);toast._t=setTimeout(()=>t.style.display="none",2600);}
 
 async function poll(){
   try{const r=await fetch("status.json?t="+Date.now(),{cache:"no-store"});
-    if(r.ok){data=await r.json(); render();}}catch(e){}
+    if(r.ok){data=await r.json();render();}}catch(e){}
 }
-function bumpImg(){imgv=Date.now(); if(mode==="tile")paintTiles(); else paintRot();}
+function bumpImg(){imgv=Date.now();if(mode==="tile")paintTiles();else if(mode==="rot")paintRot();}
 
 function render(){
-  const vms=data.vms||[];
-  const a=vms.filter(v=>v.attention).length;
+  const vms=data.vms||[], a=vms.filter(v=>v.attention).length;
   $("#count").textContent=vms.length+" VM"+(vms.length===1?"":"s");
-  const ae=$("#attn"); ae.textContent=a?("⚠ "+a+" need"+(a===1?"s":"")+" you"):"all clear";
+  const ae=$("#attn");ae.textContent=a?("⚠ "+a+" need"+(a===1?"s":"")+" you"):"all clear";
   ae.classList.toggle("on",a>0);
   $("#upd").textContent=data.updated?("updated "+timeAgo(data.updated)):"";
   $("#empty").hidden=vms.length>0;
-  if(mode==="tile")paintTiles(); else paintRot();
+  if(mode==="tile")paintTiles();else if(mode==="rot")paintRot();
 }
-function gridDims(n){let c=Math.ceil(Math.sqrt(n)); let r=Math.ceil(n/c);
-  return {c:Math.max(1,c),r:Math.max(1,r)};}
+function gridDims(n){let c=Math.ceil(Math.sqrt(n));return{c:Math.max(1,c),r:Math.max(1,Math.ceil(n/c))};}
 function paintTiles(){
-  const vms=data.vms||[], g=$("#grid");
-  const {c,r}=gridDims(vms.length);
-  g.style.gridTemplateColumns=`repeat(${c},1fr)`; g.style.gridTemplateRows=`repeat(${r},1fr)`;
+  const vms=data.vms||[],g=$("#grid"),{c,r}=gridDims(vms.length);
+  g.style.gridTemplateColumns=`repeat(${c},1fr)`;g.style.gridTemplateRows=`repeat(${r},1fr)`;
   g.innerHTML=vms.map(v=>`
-    <div class="tile ${stateClass(v.state)} ${v.attention?"attn":""}">
+    <div class="tile ${stateClass(v.state)} ${v.attention?"attn":""} ${v.vnc?"hasvnc":""}" data-id="${esc(v.id)}">
       ${v.attention?'<span class="badge">NEEDS YOU</span>':""}
-      <span class="dot"></span>
-      <div class="shot" style="background-image:url('${v.img}?v=${imgv}')"></div>
+      <span class="dot"></span><span class="live">▶ LIVE</span>
+      <div class="shot" style="background-image:url('${esc(v.img)}?v=${imgv}')"></div>
       <div class="cap">
         <div class="name">${esc(v.title)} <span class="host">· ${esc(v.host)}</span></div>
         <div class="sent">${esc(v.sentence||"")}</div>
@@ -136,51 +175,79 @@ function paintTiles(){
     </div>`).join("");
 }
 function paintRot(){
-  const vms=data.vms||[]; if(!vms.length){return;}
-  if(idx>=vms.length)idx=0;
-  const v=vms[idx];
-  $("#rShot").style.backgroundImage=`url('${v.img}?v=${imgv}')`;
+  const vms=data.vms||[];if(!vms.length)return;
+  if(idx>=vms.length)idx=0;const v=vms[idx];
+  $("#rShot").style.backgroundImage=`url('${esc(v.img)}?v=${imgv}')`;
   $("#rName").innerHTML=`${esc(v.title)} <span class="host">· ${esc(v.host)}</span>`;
   $("#rSent").textContent=v.sentence||"";
   $("#rMeta").textContent=(v.state?("state: "+v.state):"")+(v.updated?("  ·  "+timeAgo(v.updated)):"");
   $("#rot").classList.toggle("attn",!!v.attention);
+  $("#rot").classList.toggle("hasvnc",!!v.vnc);
   $("#dots").innerHTML=vms.map((x,i)=>`<i class="${i===idx?"cur":""} ${x.attention?"a":""}"></i>`).join("");
 }
-function nextRot(){
-  const vms=data.vms||[]; if(vms.length){idx=(idx+1)%vms.length; paintRot();}
-  scheduleRot();
-}
-function scheduleRot(){
-  clearTimeout(rotTimer);
-  const vms=data.vms||[]; const cur=vms[idx];
-  rotTimer=setTimeout(nextRot, cur&&cur.attention?ROT_ATTN:ROT);
-}
+function nextRot(){const vms=data.vms||[];if(vms.length){idx=(idx+1)%vms.length;paintRot();}scheduleRot();}
+function scheduleRot(){clearTimeout(rotTimer);const cur=(data.vms||[])[idx];
+  rotTimer=setTimeout(nextRot,cur&&cur.attention?ROT_ATTN:ROT);}
 function setMode(m){
+  if(m!=="vnc")prevMode=m;
   mode=m;
   $("#bTile").classList.toggle("active",m==="tile");
   $("#bRot").classList.toggle("active",m==="rot");
   $("#grid").style.display=m==="tile"?"grid":"none";
   $("#rot").classList.toggle("show",m==="rot");
   clearTimeout(rotTimer);
-  if(m==="tile")paintTiles(); else {paintRot(); scheduleRot();}
+  if(m==="tile")paintTiles();else if(m==="rot"){paintRot();scheduleRot();}
 }
-function esc(s){return (s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
-function timeAgo(iso){const t=Date.parse(iso); if(isNaN(t))return iso;
-  const s=Math.max(0,(Date.now()-t)/1000|0);
-  return s<60?s+"s ago":(s<3600?(s/60|0)+"m ago":(s/3600|0)+"h ago");}
 
+// ---- VNC ----
+function openVNC(vm){
+  if(!vm||!vm.vnc){toast("No live console for "+(vm?vm.title:"this VM"));return;}
+  closeVNC();
+  const scr=$("#vncScreen");scr.innerHTML="";
+  $("#vName").innerHTML=`${esc(vm.title)} <span class="host">· ${esc(vm.host)}</span>`;
+  const st=$("#vStat");st.className="vstat";st.textContent="connecting…";
+  const nat=$("#vNative");if(vm.vnc_native){nat.href=vm.vnc_native;nat.style.display="";nat.textContent=vm.vnc_native;}else nat.style.display="none";
+  $("#vnc").classList.add("show");
+  clearTimeout(rotTimer);
+  try{
+    rfb=new RFB(scr,vm.vnc,{});
+    rfb.scaleViewport=true;rfb.resizeSession=false;rfb.viewOnly=false;
+    rfb.addEventListener("connect",()=>{st.className="vstat conn";st.textContent="connected";});
+    rfb.addEventListener("disconnect",e=>{st.className="vstat err";
+      st.textContent="disconnected"+(e&&e.detail&&!e.detail.clean?" (link lost)":"");});
+    rfb.addEventListener("securityfailure",()=>{st.className="vstat err";st.textContent="auth/security failure";});
+  }catch(err){st.className="vstat err";st.textContent="error: "+err.message;}
+}
+function closeVNC(){
+  if(rfb){try{rfb.disconnect();}catch(e){}rfb=null;}
+  $("#vnc").classList.remove("show");
+}
+function returnFromVNC(){closeVNC();setMode(prevMode);}
+
+// events
 $("#bTile").onclick=()=>setMode("tile");
 $("#bRot").onclick=()=>setMode("rot");
+$("#vClose").onclick=returnFromVNC;
+$("#rLive").onclick=()=>openVNC((data.vms||[])[idx]);
+$("#rShot").onclick=()=>openVNC((data.vms||[])[idx]);
+$("#grid").addEventListener("click",e=>{const t=e.target.closest(".tile");if(t)openVNC(byId(t.dataset.id));});
 addEventListener("keydown",e=>{
+  if($("#vnc").classList.contains("show")){if(e.key==="Escape")returnFromVNC();return;}
   if(e.key==="t"||e.key==="T")setMode("tile");
   else if(e.key==="r"||e.key==="R")setMode("rot");
   else if(e.key==="f"||e.key==="F"){if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen();}
-  else if(e.key==="ArrowRight"&&mode==="rot"){nextRot();}
+  else if(e.key==="ArrowRight"&&mode==="rot")nextRot();
   else if(e.key==="ArrowLeft"&&mode==="rot"){const n=(data.vms||[]).length;if(n){idx=(idx-1+n)%n;paintRot();scheduleRot();}}
+  else if(e.key==="Enter"&&mode==="rot")openVNC((data.vms||[])[idx]);
 });
-const _v=new URLSearchParams(location.search).get("view");
-poll(); setInterval(poll,POLL); setInterval(bumpImg,IMG);
-setMode(_v==="rotate"||_v==="rot"?"rot":"tile");
+
+// initial view + optional ?vnc=<id> deep link
+const params=new URLSearchParams(location.search);
+const wantVnc=params.get("vnc");
+const startMode=(params.get("view")==="rotate"||params.get("view")==="rot")?"rot":"tile";
+(async()=>{await poll();setInterval(poll,POLL);setInterval(bumpImg,IMG);setMode(startMode);
+  if(wantVnc){const vm=byId(wantVnc);if(vm)openVNC(vm);else toast("No VM '"+wantVnc+"' to open");}
+})();
 </script>
 </body>
 </html>

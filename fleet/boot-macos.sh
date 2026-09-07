@@ -113,13 +113,21 @@ if $INSTALL; then
           -drive "id=InstallMedia,if=none,file=$VM_DIR/BaseSystem.img,format=raw" )
 fi
 
+VNC_BIND="${VNC_BIND:-127.0.0.1}"   # set to this host's Tailscale IP (or 0.0.0.0) for remote noVNC
+WS_PORT=$((5700 + OFFSET))
 if $HEADLESS; then
-  args+=( -display none -vnc "127.0.0.1:$VNC_DISP" )
+  # QEMU serves RFB (5900+disp) AND a WebSocket (WS_PORT) for noVNC -- no proxy needed.
+  args+=( -display none -vnc "$VNC_BIND:$VNC_DISP,websocket=$WS_PORT" )
+  cat > "$VM_DIR/vnc.env" <<VEOF
+VNC_BIND=$VNC_BIND
+VNC_WS_PORT=$WS_PORT
+VNC_RFB_PORT=$((5900 + VNC_DISP))
+VEOF
 fi
 
 rm -f "$MON_SOCK" "$QMP_SOCK"
 echo "== $NAME ($VERSION)"
 echo "   cpu=$CPU_MODEL  ram=${RAM_MB}M  smp=$THREADS(${CORES}c)  nic=$NIC"
 echo "   disk=$VM_DIR/mac_hdd_ng.img"
-echo "   ssh=localhost:$SSH_PORT  qmp=$QMP_SOCK$( $HEADLESS && echo "  vnc=127.0.0.1:$VNC_DISP" )"
+echo "   ssh=localhost:$SSH_PORT  qmp=$QMP_SOCK$( $HEADLESS && echo "  vnc-ws=$VNC_BIND:$WS_PORT (novnc)  rfb=$VNC_BIND:$((5900+VNC_DISP))" )"
 exec qemu-system-x86_64 "${args[@]}"
