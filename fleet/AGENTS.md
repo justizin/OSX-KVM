@@ -253,3 +253,31 @@ it to other hosts.
 Sonoma on the first host went past this point before the rule existed; its
 template will come from a second install (cheap now: recovery image is
 mirrored, the process is scripted).
+
+---
+
+## 10. Concurrency, collisions, and per-host parallelism
+
+Running several installs on one machine is SUPPORTED but OPTIONAL, and it is a
+per-host POLICY the coordinator sets in `fleet/assignments.json` -- not something
+a worker decides. **Default: one install at a time per machine.** A host runs
+more than one in parallel only when its `max_parallel` says so, and only within
+the headroom `preflight` reports (`max_concurrent_vms`).
+
+Concurrent *different* versions on one host do not collide -- everything mutable
+is keyed by version:
+- images + NVRAM: `fleet/vms/<version>/` (each gets its own `OVMF_VARS.fd`)
+- sockets: `$XDG_RUNTIME_DIR/osx-<version>-{mon,qmp}.sock`
+- forwarded SSH port: `2222 + offset`; VNC display: `10 + offset`
+- vmctl framebuffer probe: a unique temp file (was a shared path; fixed 2026-09-07)
+
+Rules that keep it collision-free as the fleet grows:
+1. **One fleet agent per machine** owns `~/OSX-KVM` and drives all that machine's
+   VMs. Never point two agents at the same clone -- they race on the working tree
+   and on git. If a host must run two agents, give each its own `OSX_KVM=<dir>`
+   and `FLEET_ROOT=<dir>` so no path is shared.
+2. **Never run two installs of the SAME version on one host** -- they share
+   `vms/<version>/`, sockets and ports. Different versions in parallel are fine.
+3. **Results go to a per-host branch `results/<host>`** (or are reported to the
+   coordinator). Workers never push to `main`; the coordinator is its only writer
+   and merges each host's results in. This removes all distributed-write races.

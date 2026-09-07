@@ -21,6 +21,7 @@ import json
 import os
 import socket
 import subprocess
+import tempfile
 import sys
 import time
 
@@ -73,8 +74,13 @@ class QMP:
         self.cmd("input-send-event", events=events)
 
     def fb_size(self):
-        """Framebuffer size, read back from a throwaway PPM header."""
-        tmp = "/tmp/.vmctl-probe.ppm"
+        """Framebuffer size, read back from a throwaway PPM header.
+
+        Uses a unique temp file: several VMs may probe concurrently, and a
+        shared path would let one VM's screendump clobber another's read.
+        """
+        fd, tmp = tempfile.mkstemp(prefix=".vmctl-probe-", suffix=".ppm")
+        os.close(fd)
         self.cmd("screendump", filename=tmp)
         with open(tmp, "rb") as fh:
             assert fh.readline().strip() == b"P6"
@@ -127,10 +133,12 @@ class QMP:
         shifted = {"!": "1", "@": "2", "#": "3", "$": "4", "%": "5",
                    "^": "6", "&": "7", "*": "8", "(": "9", ")": "0",
                    "_": "minus", "+": "equal", "?": "slash", ":": "semicolon",
-                   '"': "apostrophe", "<": "comma", ">": "dot", "~": "grave"}
+                   '"': "apostrophe", "<": "comma", ">": "dot", "~": "grave",
+                   "|": "backslash", "{": "bracket_left", "}": "bracket_right"}
         plain = {" ": "spc", "-": "minus", "=": "equal", ".": "dot",
                  ",": "comma", "/": "slash", ";": "semicolon",
-                 "'": "apostrophe", "`": "grave"}
+                 "'": "apostrophe", "`": "grave", "\\": "backslash",
+                 "[": "bracket_left", "]": "bracket_right"}
         for ch in text:
             if ch.isalpha():
                 self._maybe_shift(ch.lower(), ch.isupper())

@@ -1,0 +1,15 @@
+{
+  "_comment": "Per-host policy and version assignment. max_parallel is POLICY (how many installs the host may run at once), independent of the hardware max_concurrent_vms capability preflight reports. Default 1. Coordinator (ugnomarchy) is the sole writer of this file.",
+  "updated": "2026-09-07",
+  "hosts": {
+    "ugnomarchy":  {"avx2": true,  "max_parallel": 1, "assigned": ["mojave"],  "status": "installing mojave; also runs coordinator + mirror"},
+    "omarchiMac":  {"avx2": true,  "max_parallel": 1, "assigned": [],           "status": "ready pending deps; single-VM by user request"},
+    "og128x01":    {"avx2": false, "max_parallel": 1, "assigned": [],           "status": "high-capacity (125GB); pre-Ventura only; blocked on clone approval + deps; max_parallel raisable on request"},
+    "Remac macOS configuration tool": {"avx2": null, "max_parallel": 1, "assigned": [], "status": "preflight not yet returned"}
+  },
+  "notes": [
+    "AVX2 hosts (ugnomarchy, omarchiMac) are the ONLY ones that can run Ventura/Sonoma/Sequoia/Tahoe.",
+    "Pre-Ventura versions (High Sierra, Catalina, Big Sur, Monterey) can go to any host; prefer og128x01 for its capacity.",
+    "max_parallel defaults to 1 for the initial fan-out; raise per-host only when the user designates a machine for parallel installs."
+  ]
+}
