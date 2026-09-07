@@ -205,8 +205,9 @@ def save_image(url, sess, filename='', directory=''):
         'Host': purl.hostname,
         'Connection': 'close',
         'User-Agent': 'InternetRecovery/1.0',
-        'Cookie': '='.join(['AssetToken', sess])
     }
+    if sess:
+        headers['Cookie'] = '='.join(['AssetToken', sess])
 
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -255,6 +256,28 @@ def save_image(url, sess, filename='', directory=''):
         print('\nDownload complete!')
 
     return os.path.join(directory, os.path.basename(filename))
+
+
+def fetch_file(url, sess, product, filename, directory):
+    """Download one recovery file, preferring a local mirror when configured.
+
+    MACOS_RECOVERY_MIRROR=<base url> makes the script try
+    <base url>/<product id>/<basename> first, and fall back to Apple's CDN if
+    the mirror does not have it. The mirror is a plain HTTP tree; no session
+    cookie is sent to it. Verification against the chunklist is unchanged.
+    """
+    mirror = os.environ.get('MACOS_RECOVERY_MIRROR', '').rstrip('/')
+    basename = filename if filename else os.path.basename(urlparse(url).path)
+    if mirror:
+        murl = f'{mirror}/{product}/{basename}'
+        # Probe first: run_query() exits the process on HTTP errors, so the
+        # miss has to be detected before handing the URL to save_image().
+        try:
+            urlopen(Request(url=murl, method='HEAD')).close()
+            return save_image(murl, '', filename, directory)
+        except (HTTPError, OSError) as e:
+            print(f'Mirror miss for {murl} ({e}); falling back to Apple')
+    return save_image(url, sess, filename, directory)
 
 
 def verify_image(dmgpath, cnkpath):
@@ -309,9 +332,9 @@ def action_download(args):
         print(info)
     print(f'Downloading {info[INFO_PRODUCT]}...')
     cnkname = '' if args.basename == '' else args.basename + '.chunklist'
-    cnkpath = save_image(info[INFO_SIGN_LINK], info[INFO_SIGN_SESS], cnkname, args.outdir)
+    cnkpath = fetch_file(info[INFO_SIGN_LINK], info[INFO_SIGN_SESS], info[INFO_PRODUCT], cnkname, args.outdir)
     dmgname = '' if args.basename == '' else args.basename + '.dmg'
-    dmgpath = save_image(info[INFO_IMAGE_LINK], info[INFO_IMAGE_SESS], dmgname, args.outdir)
+    dmgpath = fetch_file(info[INFO_IMAGE_LINK], info[INFO_IMAGE_SESS], info[INFO_PRODUCT], dmgname, args.outdir)
     try:
         verify_image(dmgpath, cnkpath)
         return 0
@@ -494,7 +517,8 @@ def main():
                         help='Action to perform: "download" - performs recovery downloading,'
                         ' "selfcheck" checks whether MLB serial validation is possible, "verify" performs'
                         ' MLB serial verification, "guess" tries to find suitable mac model for MLB.')
-    parser.add_argument('-o', '--outdir', type=str, default='com.apple.recovery.boot',
+    parser.add_argument('-o', '--outdir', type=str,
+                        default=os.environ.get('MACOS_RECOVERY_OUTDIR', 'com.apple.recovery.boot'),
                         help='customise output directory for downloading, defaults to com.apple.recovery.boot')
     parser.add_argument('-n', '--basename', type=str, default='',
                         help='customise base name for downloading, defaults to remote name')
@@ -571,7 +595,8 @@ def main():
     except:
         os_type = "default"
     args = gdata(mlb = product["m"], board_id = product["b"], diagnostics =
-            False, os_type = os_type, verbose=False, basename="", outdir=".")
+            False, os_type = os_type, verbose=False, basename="",
+            outdir=os.environ.get('MACOS_RECOVERY_OUTDIR', '.'))
     action_download(args)
 
 
