@@ -1,0 +1,58 @@
+{
+  "host": "ugnomarchy",
+  "hardware": "Intel i7-9750H (Coffee Lake) laptop, 62 GB RAM, NVMe",
+  "version": "mojave",
+  "outcome": "success",
+  "template": "golden/mojave-template.qcow2",
+  "template_sha256": "67600364c52db3ed2d3382b64e29a41bdbddfe283d27651fa0956ae37e086fa8",
+  "template_size": "14.3 GiB (qcow2, compressed; 6.94% of 256 GiB allocated)",
+  "config": {
+    "cpu_model": "Penryn",
+    "smp": "4,cores=2",
+    "ram_mb": 8192,
+    "nic": "vmxnet3",
+    "hid_bus": "ehci (USB 2.0)",
+    "display": "headless, VNC ws :5701 / rfb :5911",
+    "filesystem": "Mac OS Extended (Journaled)"
+  },
+  "timeline": {
+    "t0_eula_agree": "2026-09-07T15:46:48-07:00",
+    "first_reboot_download_done": "2026-09-07T15:54:01-07:00",
+    "second_reboot_install_done": "2026-09-07T16:09:48-07:00",
+    "setup_assistant_freeze_point": "2026-09-07T16:11:49-07:00",
+    "agree_to_setup_assistant": "25m01s",
+    "download_phase": "~7m",
+    "install_phase": "~16m",
+    "first_boot": "~2m"
+  },
+  "metrics_from_t0": {
+    "cpu_seconds": 3113,
+    "avg_cores": 2.05,
+    "peak_rss_mb": 8314,
+    "disk_written_mb": 19111,
+    "disk_read_mb": 289,
+    "note": "measure.sh at 30s; identical script to be used on og128x01 for comparison"
+  },
+  "notes": [
+    "Booted headless with WebSocket VNC on the tailnet; driven entirely over QMP (vmctl.py); EULA clicked on explicit user authorization.",
+    "Both installer reboots auto-booted via OpenCore (Timeout=2) with no picker intervention; a hard reset earlier in the day had NOT auto-booted -- different case.",
+    "Phase-2 health check 1 min after reboot was thin (9.5 MiB/min, idle vCPUs) = early boot, not the earlier all-cores deadlock; 2.5 min later 859 MiB/min.",
+    "Setup Assistant ignores ACPI powerdown; VM stopped by PID. qemu-img check clean (7.11% allocated).",
+    "First template cut was killed by the harness for 'low memory' -- host had 56 GB available, 57 GB was page cache; rerun detached with -t none -T none.",
+    "Earlier in the day: xhci HID dead in Mojave installer (fixed: ehci); virtio-net gave no en0 -> 'recovery server could not be contacted' (fixed: vmxnet3); this run used both fixes from the start."
+  ],
+  "template_cut": {
+    "tool": "qemu-img convert -O qcow2 -c -t none -T none",
+    "duration": "21m24s (16:21:06 -> 16:42:30)",
+    "check": "No errors"
+  },
+  "metrics_to_vm_exit": {
+    "wall": "27m47s (to last sample 16:14:35, ~2.5m after freeze point)",
+    "cpu_seconds": 3413,
+    "avg_cores": 2.05,
+    "peak_rss_mb": 8314,
+    "disk_written_mb": 19222,
+    "disk_read_mb": 372,
+    "samples": 48
+  }
+}
