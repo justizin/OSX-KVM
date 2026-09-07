@@ -3,6 +3,7 @@
 #   measure.sh <version> [interval=30]        -> appends vms/<version>/metrics.csv until the VM exits
 #   measure.sh <version> --summary            -> wall time, CPU-seconds, peak RSS, disk written
 # Run the SAME script on every host so numbers are comparable.
+# elapsed_s counts from vms/<version>/t0-agree.txt (the EULA Agree click) when present.
 set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; FLEET_ROOT="${FLEET_ROOT:-$HERE}"
 V="${1:?usage: measure.sh <version> [interval|--summary]}"; ARG="${2:-30}"
@@ -24,12 +25,14 @@ fi
 INT="$ARG"; mkdir -p "$(dirname "$OUT")"
 pid_of(){ for p in $(pgrep -f "osx-$V-qmp.sock"); do case "$(cat /proc/$p/comm 2>/dev/null)" in qemu*) echo "$p"; return;; esac; done; }
 PID="$(pid_of)"; [ -n "$PID" ] || { echo "VM $V not running" >&2; exit 2; }
-CLK=$(getconf CLK_TCK); T0=$(date +%s); HOST=$(hostname)
+CLK=$(getconf CLK_TCK); HOST=$(hostname)
+T0=$(date +%s); T0F="$FLEET_ROOT/vms/$V/t0-agree.txt"
+[ -s "$T0F" ] && T0=$(date -d "$(cat "$T0F")" +%s 2>/dev/null || echo "$T0")   # t0 = EULA Agree click if logged
 [ -f "$OUT" ] || echo "ts,host,elapsed_s,cpu_s,rss_mb,write_mb,read_mb,load1" > "$OUT"
 while [ -d "/proc/$PID" ]; do
   st=$(cat /proc/$PID/stat 2>/dev/null) || break
   # fields after the ")" : utime=14 stime=15 (1-indexed in full stat)
-  set -- ${st##*) }; cpu=$(( ($12 + $13) / CLK ))
+  set -- ${st##*) }; cpu=$(( (${12} + ${13}) / CLK ))   # ${12}: bash needs braces above $9
   rss=$(awk '/VmRSS/{print int($2/1024)}' /proc/$PID/status 2>/dev/null)
   w=$(awk '/^write_bytes/{print int($2/1048576)}' /proc/$PID/io 2>/dev/null)
   r=$(awk '/^read_bytes/{print int($2/1048576)}' /proc/$PID/io 2>/dev/null)
