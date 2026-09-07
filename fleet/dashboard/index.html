@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>macOS Fleet</title>
+<style>
+  :root{
+    --bg:#0b0d10; --panel:#14181d; --edge:#232a31; --ink:#e8edf2; --dim:#8b97a3;
+    --ok:#3fb950; --go:#2f81f7; --warn:#d29922;
+    --alert:#ff3b30; --alert-glow:rgba(255,59,48,.55); --alert-tint:rgba(255,59,48,.14);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;overflow:hidden}
+  #bar{display:flex;align-items:center;gap:20px;padding:10px 20px;background:var(--panel);
+    border-bottom:1px solid var(--edge);height:56px}
+  #bar h1{font-size:20px;margin:0;font-weight:700;letter-spacing:.3px}
+  #bar .sp{flex:1}
+  #bar .stat{font-size:15px;color:var(--dim)}
+  #bar .attn{font-weight:700}
+  #bar .attn.on{color:var(--alert)}
+  #bar button{background:#1f262d;color:var(--ink);border:1px solid var(--edge);
+    border-radius:8px;padding:8px 14px;font-size:15px;cursor:pointer}
+  #bar button.active{background:var(--go);border-color:var(--go)}
+  #stage{position:absolute;top:56px;left:0;right:0;bottom:0}
+
+  /* ---- tiled ---- */
+  #grid{height:100%;display:grid;gap:14px;padding:14px}
+  .tile{position:relative;background:#000;border:2px solid var(--edge);border-radius:12px;
+    overflow:hidden;display:flex;flex-direction:column;min-height:0}
+  .tile .shot{flex:1;min-height:0;background:#000 center/contain no-repeat}
+  .tile .cap{padding:10px 12px;background:var(--panel);border-top:1px solid var(--edge)}
+  .tile .name{font-size:17px;font-weight:700}
+  .tile .name .host{color:var(--dim);font-weight:500}
+  .tile .sent{font-size:15px;color:var(--dim);margin-top:3px;line-height:1.25;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .tile .dot{position:absolute;top:10px;right:10px;width:12px;height:12px;border-radius:50%;
+    background:var(--go);box-shadow:0 0 0 3px rgba(0,0,0,.4)}
+  .tile.state-done .dot{background:var(--ok)} .tile.state-run .dot{background:var(--go)}
+  .tile.state-wait .dot{background:var(--warn)} .tile.state-idle .dot{background:var(--dim)}
+  .tile.attn{border-color:var(--alert);box-shadow:0 0 0 4px var(--alert-glow),0 0 34px var(--alert-glow);
+    animation:pulse 1.6s ease-in-out infinite}
+  .tile.attn::after{content:"";position:absolute;inset:0;background:var(--alert-tint);pointer-events:none}
+  .tile.attn .dot{background:var(--alert)}
+  .tile.attn .badge{position:absolute;top:10px;left:10px;background:var(--alert);color:#fff;
+    font-size:13px;font-weight:800;letter-spacing:.5px;padding:4px 9px;border-radius:6px;z-index:2}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 4px var(--alert-glow),0 0 22px var(--alert-glow)}
+    50%{box-shadow:0 0 0 5px var(--alert-glow),0 0 46px var(--alert-glow)}}
+
+  /* ---- rotate ---- */
+  #rot{height:100%;display:none;flex-direction:column;position:relative}
+  #rot.show{display:flex}
+  #rot .shotwrap{flex:1;min-height:0;background:#000 center/contain no-repeat;margin:24px 24px 0}
+  #rot .panel{padding:20px 40px 34px;text-align:center}
+  #rot .rname{font-size:34px;font-weight:800}
+  #rot .rname .host{color:var(--dim);font-weight:600;font-size:26px}
+  #rot .rsent{font-size:clamp(28px,4.6vw,62px);font-weight:700;line-height:1.15;margin-top:10px}
+  #rot .rmeta{color:var(--dim);font-size:18px;margin-top:14px}
+  #rot.attn{background:linear-gradient(180deg,rgba(255,59,48,.10),rgba(255,59,48,.22))}
+  #rot.attn::before{content:"";position:absolute;inset:0;border:12px solid var(--alert);
+    box-shadow:inset 0 0 90px var(--alert-glow);pointer-events:none;animation:pulse2 1.4s infinite}
+  #rot.attn .rsent{color:#fff}
+  #rot .rbadge{display:none}
+  #rot.attn .rbadge{display:inline-block;background:var(--alert);color:#fff;font-weight:800;
+    font-size:22px;letter-spacing:1px;padding:8px 20px;border-radius:10px;margin-bottom:12px}
+  @keyframes pulse2{0%,100%{opacity:.85}50%{opacity:1}}
+  #dots{position:absolute;bottom:12px;left:0;right:0;display:flex;gap:8px;justify-content:center}
+  #dots i{width:10px;height:10px;border-radius:50%;background:#333;display:block}
+  #dots i.cur{background:var(--ink)} #dots i.a{background:var(--alert)}
+  #empty{display:flex;height:100%;align-items:center;justify-content:center;color:var(--dim);font-size:24px}
+</style>
+</head>
+<body>
+  <div id="bar">
+    <h1>macOS Fleet</h1>
+    <button id="bTile" class="active">Tiled</button>
+    <button id="bRot">Rotate</button>
+    <span class="sp"></span>
+    <span class="stat" id="count">–</span>
+    <span class="stat attn" id="attn">–</span>
+    <span class="stat" id="upd">–</span>
+  </div>
+  <div id="stage">
+    <div id="grid"></div>
+    <div id="rot">
+      <div class="shotwrap" id="rShot"></div>
+      <div class="panel">
+        <div class="rbadge">NEEDS YOU</div>
+        <div class="rname" id="rName"></div>
+        <div class="rsent" id="rSent"></div>
+        <div class="rmeta" id="rMeta"></div>
+      </div>
+      <div id="dots"></div>
+    </div>
+    <div id="empty" hidden>No active VMs reported yet.</div>
+  </div>
+<script>
+const POLL=3000, IMG=4000, ROT=8000, ROT_ATTN=14000;
+let data={vms:[]}, mode="tile", idx=0, rotTimer=null, imgv=Date.now();
+const $=s=>document.querySelector(s);
+const stateClass=s=>({installing:"state-run",booting:"state-run",done:"state-done",
+  ready:"state-done",waiting:"state-wait",idle:"state-idle"}[s]||"state-run");
+
+async function poll(){
+  try{const r=await fetch("status.json?t="+Date.now(),{cache:"no-store"});
+    if(r.ok){data=await r.json(); render();}}catch(e){}
+}
+function bumpImg(){imgv=Date.now(); if(mode==="tile")paintTiles(); else paintRot();}
+
+function render(){
+  const vms=data.vms||[];
+  const a=vms.filter(v=>v.attention).length;
+  $("#count").textContent=vms.length+" VM"+(vms.length===1?"":"s");
+  const ae=$("#attn"); ae.textContent=a?("⚠ "+a+" need"+(a===1?"s":"")+" you"):"all clear";
+  ae.classList.toggle("on",a>0);
+  $("#upd").textContent=data.updated?("updated "+timeAgo(data.updated)):"";
+  $("#empty").hidden=vms.length>0;
+  if(mode==="tile")paintTiles(); else paintRot();
+}
+function gridDims(n){let c=Math.ceil(Math.sqrt(n)); let r=Math.ceil(n/c);
+  return {c:Math.max(1,c),r:Math.max(1,r)};}
+function paintTiles(){
+  const vms=data.vms||[], g=$("#grid");
+  const {c,r}=gridDims(vms.length);
+  g.style.gridTemplateColumns=`repeat(${c},1fr)`; g.style.gridTemplateRows=`repeat(${r},1fr)`;
+  g.innerHTML=vms.map(v=>`
+    <div class="tile ${stateClass(v.state)} ${v.attention?"attn":""}">
+      ${v.attention?'<span class="badge">NEEDS YOU</span>':""}
+      <span class="dot"></span>
+      <div class="shot" style="background-image:url('${v.img}?v=${imgv}')"></div>
+      <div class="cap">
+        <div class="name">${esc(v.title)} <span class="host">· ${esc(v.host)}</span></div>
+        <div class="sent">${esc(v.sentence||"")}</div>
+      </div>
+    </div>`).join("");
+}
+function paintRot(){
+  const vms=data.vms||[]; if(!vms.length){return;}
+  if(idx>=vms.length)idx=0;
+  const v=vms[idx];
+  $("#rShot").style.backgroundImage=`url('${v.img}?v=${imgv}')`;
+  $("#rName").innerHTML=`${esc(v.title)} <span class="host">· ${esc(v.host)}</span>`;
+  $("#rSent").textContent=v.sentence||"";
+  $("#rMeta").textContent=(v.state?("state: "+v.state):"")+(v.updated?("  ·  "+timeAgo(v.updated)):"");
+  $("#rot").classList.toggle("attn",!!v.attention);
+  $("#dots").innerHTML=vms.map((x,i)=>`<i class="${i===idx?"cur":""} ${x.attention?"a":""}"></i>`).join("");
+}
+function nextRot(){
+  const vms=data.vms||[]; if(vms.length){idx=(idx+1)%vms.length; paintRot();}
+  scheduleRot();
+}
+function scheduleRot(){
+  clearTimeout(rotTimer);
+  const vms=data.vms||[]; const cur=vms[idx];
+  rotTimer=setTimeout(nextRot, cur&&cur.attention?ROT_ATTN:ROT);
+}
+function setMode(m){
+  mode=m;
+  $("#bTile").classList.toggle("active",m==="tile");
+  $("#bRot").classList.toggle("active",m==="rot");
+  $("#grid").style.display=m==="tile"?"grid":"none";
+  $("#rot").classList.toggle("show",m==="rot");
+  clearTimeout(rotTimer);
+  if(m==="tile")paintTiles(); else {paintRot(); scheduleRot();}
+}
+function esc(s){return (s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function timeAgo(iso){const t=Date.parse(iso); if(isNaN(t))return iso;
+  const s=Math.max(0,(Date.now()-t)/1000|0);
+  return s<60?s+"s ago":(s<3600?(s/60|0)+"m ago":(s/3600|0)+"h ago");}
+
+$("#bTile").onclick=()=>setMode("tile");
+$("#bRot").onclick=()=>setMode("rot");
+addEventListener("keydown",e=>{
+  if(e.key==="t"||e.key==="T")setMode("tile");
+  else if(e.key==="r"||e.key==="R")setMode("rot");
+  else if(e.key==="f"||e.key==="F"){if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen();}
+  else if(e.key==="ArrowRight"&&mode==="rot"){nextRot();}
+  else if(e.key==="ArrowLeft"&&mode==="rot"){const n=(data.vms||[]).length;if(n){idx=(idx-1+n)%n;paintRot();scheduleRot();}}
+});
+const _v=new URLSearchParams(location.search).get("view");
+poll(); setInterval(poll,POLL); setInterval(bumpImg,IMG);
+setMode(_v==="rotate"||_v==="rot"?"rot":"tile");
+</script>
+</body>
+</html>

@@ -15,3 +15,7 @@ OpenCore-Catalina/EFI/OC/Resources/
 fleet/vms/
 fleet/golden/
 fleet/mirror/data/
+fleet/dashboard/dash-data/
+fleet/dashboard/status.json
+fleet/dashboard/*.png
+fleet/deploy/dash-data/

@@ -1,0 +1,15 @@
+# Persistent fleet services for the always-on server (og128x01, Mac Pro).
+# Both reached by workers over Tailscale so a flaky wired bridge does not matter.
+services:
+  macos-mirror:
+    build: { context: ../mirror, dockerfile: Containerfile }
+    image: macos-recovery-mirror:local
+    ports: ["8080:80"]
+    volumes: ["${MIRROR_ROOT:-../mirror/data}:/srv/macos-recovery:ro"]
+    restart: unless-stopped
+  macos-dashboard:
+    build: { context: ../dashboard, dockerfile: Containerfile }
+    image: macos-fleet-dashboard:local
+    ports: ["8090:8090"]
+    volumes: ["${DASH_DATA:-./dash-data}:/data"]
+    restart: unless-stopped
