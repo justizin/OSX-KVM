@@ -1,0 +1,19 @@
+{
+  "host": "ugnomarchy",
+  "version": "mojave",
+  "started": "2026-09-07",
+  "outcome": "in-progress",
+  "cpu_model_used": "Penryn",
+  "smp": "4,cores=2",
+  "ram_mb": 8192,
+  "nic": "vmxnet3",
+  "hid_bus": "ehci (USB 2.0)",
+  "filesystem": "Mac OS Extended (Journaled)",
+  "notes": [
+    "Penryn boots on Coffee Lake host (i7-9750H) -- OpenCore picker + recovery OK.",
+    "HID FIX: Mojave does not track USB 3.0 (xhci) keyboard/tablet in the installer; mouse/keyboard appeared dead. Moving both to the USB 2.0 (ehci) bus fixed it.",
+    "NIC FIX: virtio-net-pci gave no en0 -> 'recovery server could not be contacted'. vmxnet3 works: en0=10.0.2.15, ping apple 2/2 0% loss.",
+    "Clock was correct (not a cert-date issue).",
+    "Disk erased as 'Macintosh HD', Mac OS Extended (Journaled) -- Mojave installer default."
+  ]
+}
