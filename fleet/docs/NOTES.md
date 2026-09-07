@@ -403,3 +403,10 @@ Scope limit worth stating upstream: this caches the *recovery* image only. The
 ~13 GB full installer that "Reinstall macOS" streams from Apple's CDN during
 the install is not touched by fetch-macOS-v2.py; the golden-image strategy is
 what removes that cost.
+
+## og128x01 services (2026-09-07)
+- Interim, no docker yet: dashboard http://og128x01.hydra-hammerhead.ts.net:8090 (fleet/dashboard/server.py),
+  mirror http://og128x01.hydra-hammerhead.ts.net:8080 (python3 http.server over fleet/mirror/data, no byte ranges).
+- All 9 recovery images are in the mirror (index.json). The :80 nginx gateway in fleet/deploy goes live once
+  docker.io + docker-compose are installed (root). Debian trixie package is `docker-compose` (2.26), not docker-compose-v2.
+- Per-version attempt checkouts on og128x01: ~/Work/funtime/<version>/OSX-KVM, each with an `upstream` remote (kholia).

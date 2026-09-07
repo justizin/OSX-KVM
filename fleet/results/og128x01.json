@@ -1,19 +1,133 @@
 {
   "host": "og128x01",
-  "probed_at": "2026-09-07",
-  "source": "hand-gathered by peer session (its git clone was blocked by that session's permission classifier; not from fleet/preflight.sh)",
-  "official": false,
+  "probed_at": "2026-09-07T15:09:10-07:00",
   "distro": "Debian GNU/Linux 13 (trixie)",
   "kernel": "6.12.107+deb13-amd64",
-  "cpu": {"model": "Intel Xeon E5-2697 v2 (Ivy Bridge)", "cores": 12, "threads": 24,
-          "virt": "vmx", "avx2": false, "sse4_2": true},
-  "kvm": {"device": true, "user_in_kvm_group": false, "has_sudo": true, "ignore_msrs": "unknown"},
-  "mem_gb": 125,
-  "disk_free_gb": 719,
-  "tailscale": "og128x01.hydra-hammerhead.ts.net",
-  "eligible_versions": ["high-sierra", "mojave", "catalina", "big-sur", "monterey"],
-  "ineligible": ["ventura", "sonoma", "sequoia", "tahoe"],
-  "reason_ineligible": "no AVX2",
-  "capacity_note": "125 GB RAM / 719 GB free -> comfortably several parallel installs; a primary worker",
-  "blockers": ["git clone not yet approved on that session", "qemu-system-x86 + dmg2img not installed", "user not in kvm group", "ignore_msrs not confirmed"]
+  "cpu": {
+    "model": "Intel(R) Xeon(R) CPU E5-2697 v2 @ 2.70GHz",
+    "vendor": "GenuineIntel",
+    "cores": 12,
+    "threads": 24,
+    "virt": "vmx",
+    "avx2": false,
+    "sse4_2": true
+  },
+  "kvm": {
+    "device": true,
+    "rw": true,
+    "ignore_msrs": "N"
+  },
+  "qemu": {
+    "path": "",
+    "version": "",
+    "meets_min": false
+  },
+  "dmg2img": "",
+  "mem_gb": 126,
+  "disk_free_gb": 718,
+  "max_concurrent_vms": 7,
+  "blockers": [
+    "qemu-system-x86_64 not installed",
+    "dmg2img not installed (AUR on Arch)",
+    "kvm ignore_msrs is 'N', needs 1/Y (see kvm.conf)"
+  ],
+  "versions": [
+    {
+      "key": "high-sierra",
+      "name": "High Sierra (10.13)",
+      "cpu": "Penryn",
+      "gate": "sse4_2",
+      "supported": false,
+      "reason": "host blocked: qemu-system-x86_64 not installed"
+    },
+    {
+      "key": "mojave",
+      "name": "Mojave (10.14)",
+      "cpu": "Penryn",
+      "gate": "sse4_2",
+      "supported": false,
+      "reason": "host blocked: qemu-system-x86_64 not installed"
+    },
+    {
+      "key": "catalina",
+      "name": "Catalina (10.15)",
+      "cpu": "Penryn",
+      "gate": "sse4_2",
+      "supported": false,
+      "reason": "host blocked: qemu-system-x86_64 not installed"
+    },
+    {
+      "key": "big-sur",
+      "name": "Big Sur (11)",
+      "cpu": "Penryn",
+      "gate": "sse4_2",
+      "supported": false,
+      "reason": "host blocked: qemu-system-x86_64 not installed"
+    },
+    {
+      "key": "monterey",
+      "name": "Monterey (12)",
+      "cpu": "Penryn",
+      "gate": "sse4_2",
+      "supported": false,
+      "reason": "host blocked: qemu-system-x86_64 not installed"
+    },
+    {
+      "key": "ventura",
+      "name": "Ventura (13)",
+      "cpu": "Skylake-Client,-hle,-rtm",
+      "gate": "avx2",
+      "supported": false,
+      "reason": "host blocked: qemu-system-x86_64 not installed"
+    },
+    {
+      "key": "sonoma",
+      "name": "Sonoma (14)",
+      "cpu": "Skylake-Client,-hle,-rtm",
+      "gate": "avx2",
+      "supported": false,
+      "reason": "host blocked: qemu-system-x86_64 not installed"
+    },
+    {
+      "key": "sequoia",
+      "name": "Sequoia (15)",
+      "cpu": "Skylake-Client,-hle,-rtm",
+      "gate": "avx2",
+      "supported": false,
+      "reason": "host blocked: qemu-system-x86_64 not installed"
+    },
+    {
+      "key": "tahoe",
+      "name": "Tahoe (26)",
+      "cpu": "Skylake-Client,-hle,-rtm",
+      "gate": "avx2",
+      "supported": false,
+      "reason": "host blocked: qemu-system-x86_64 not installed"
+    }
+  ],
+  "official": true,
+  "source": "fleet/preflight.sh run by the og128x01 coordinator session",
+  "checkouts": {
+    "services": "~/src/claude/OSX-KVM",
+    "attempts": "~/Work/funtime/<version>/OSX-KVM (one clone per version, upstream=kholia)"
+  },
+  "services": {
+    "mirror": {
+      "state": "populated, all 9 versions, 5.8 GB",
+      "url": "http://og128x01.hydra-hammerhead.ts.net:8080",
+      "serving": "python3 http.server (interim; no Range support)"
+    },
+    "dashboard": {
+      "state": "up",
+      "url": "http://og128x01.hydra-hammerhead.ts.net:8090",
+      "serving": "fleet/dashboard/server.py (interim)"
+    },
+    "gateway_80": "NOT up: docker not installed; sudo needs a password"
+  },
+  "root_todo": [
+    "apt-get install -y docker.io docker-compose docker-buildx qemu-system-x86 qemu-utils dmg2img",
+    "usermod -aG docker sneakernaut",
+    "cp ~/src/claude/OSX-KVM/kvm.conf /etc/modprobe.d/kvm.conf; echo 1 > /sys/module/kvm/parameters/ignore_msrs",
+    "loginctl enable-linger sneakernaut"
+  ]
 }
