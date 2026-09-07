@@ -14,8 +14,8 @@ Prereqs on og128x01: docker + docker compose, git, this fork cloned to ~/OSX-KVM
     #   dashboard  -> http://<og128x01>:8090   (open ?view=rotate on the projector)
 
 ## 3. Point workers at og128x01 over Tailscale (survives the wired bridge)
-    export MACOS_RECOVERY_MIRROR=http://100.90.170.92:8080
-    export DASHBOARD_URL=http://100.90.170.92:8090
+    export MACOS_RECOVERY_MIRROR=http://og128x01.hydra-hammerhead.ts.net:8080
+    export DASHBOARD_URL=http://og128x01.hydra-hammerhead.ts.net:8090
 
 ## Network resilience — the wired switch is bridged over an unreliable wifi extender
 - Tailscale already gives a direct, interface-agnostic path; keep it running.

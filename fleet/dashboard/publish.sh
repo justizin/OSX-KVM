@@ -3,7 +3,7 @@
 #   DASHBOARD_URL=http://<og128x01>:8090 ./publish.sh <id> <host> <title> <state> <attn 0|1> "<sentence>"
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; FLEET="$(cd "$HERE/.." && pwd)"
-DASH="${DASHBOARD_URL:-http://100.90.170.92:8090}"   # og128x01 over Tailscale by default
+DASH="${DASHBOARD_URL:-http://og128x01.hydra-hammerhead.ts.net:8090}"   # og128x01 over Tailscale by default
 id="$1"; host="$2"; title="$3"; state="$4"; attn="$5"; sent="${6:-}"
 # console endpoints (from boot-macos.sh --headless). VNC_HOST overrides the bind
 # address with a routable one (this worker's Tailscale IP) for the projector browser.

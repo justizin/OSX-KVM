@@ -10,7 +10,7 @@
   "kvm": {"device": true, "user_in_kvm_group": false, "has_sudo": true, "ignore_msrs": "unknown"},
   "mem_gb": 125,
   "disk_free_gb": 719,
-  "tailscale": "100.90.170.92",
+  "tailscale": "og128x01.hydra-hammerhead.ts.net",
   "eligible_versions": ["high-sierra", "mojave", "catalina", "big-sur", "monterey"],
   "ineligible": ["ventura", "sonoma", "sequoia", "tahoe"],
   "reason_ineligible": "no AVX2",

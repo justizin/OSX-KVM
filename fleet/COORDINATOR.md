@@ -15,7 +15,7 @@ not be infrastructure):
 ## Topology (2026-09-07)
 - og128x01  Mac Pro, 128GB/24c/1TB, always-on. SERVICES host: mirror :8080 +
   dashboard :8090 (fleet/deploy). Heavy pre-Ventura parallel installs. Reached
-  over Tailscale 100.90.170.92 (+ wifi backup). No AVX2 -> Monterey and older only.
+  over Tailscale og128x01.hydra-hammerhead.ts.net (+ wifi backup). No AVX2 -> Monterey and older only.
 - omarchiMac  i7-7700K, 31GB, AVX2. COORDINATOR + one AVX2 install at a time.
 - ugnomarchy  laptop. Disposable worker. NOT infrastructure.
 
@@ -33,6 +33,6 @@ not be infrastructure):
     VM=<version> fleet/vmctl.py shot /tmp/s.png        # drive via QMP
     fleet/health.sh <version> 60                       # wedged vs idle vs healthy
     fleet/record.sh <version> &                        # frames + log (run under a watch)
-    DASHBOARD_URL=http://100.90.170.92:8090 fleet/dashboard/publish.sh <version> ...
+    DASHBOARD_URL=http://og128x01.hydra-hammerhead.ts.net:8090 fleet/dashboard/publish.sh <version> ...
 Stop at the FIRST Setup Assistant screen and cut the template (before any account).
 EULA (Agree) is a human gate on every install. Assign Ventura+ only to AVX2 hosts.

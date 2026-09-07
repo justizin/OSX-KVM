@@ -4,15 +4,45 @@
   "topology": {
     "services_host": "og128x01",
     "coordinator_host": "omarchiMac (planned; currently ugnomarchy)",
-    "mirror_url_tailscale": "http://100.90.170.92:8080",
-    "dashboard_url_tailscale": "http://100.90.170.92:8090",
-    "note": "Persistent services (mirror + dashboard) live on og128x01, the always-on Mac Pro. ugnomarchy is a laptop and must not be a hard dependency."
+    "note": "Persistent services (mirror + dashboard) live on og128x01, the always-on Mac Pro. ugnomarchy is a laptop and must not be a hard dependency.",
+    "tailnet": "hydra-hammerhead.ts.net",
+    "mirror_url": "http://og128x01.hydra-hammerhead.ts.net:8080",
+    "dashboard_url": "http://og128x01.hydra-hammerhead.ts.net:8090",
+    "worker_console_pattern": "each worker publishes VNC_HOST=<host>.hydra-hammerhead.ts.net so the projector browser reaches its console"
   },
   "hosts": {
-    "og128x01":   {"hardware": "Mac Pro Xeon, 128GB, 24c, 1TB NVMe, headless, always-on", "avx2": false, "max_parallel": 1, "assigned": [], "role": "services (mirror+dashboard) + heavy pre-Ventura installs", "status": "blocked: clone approval + docker + qemu/dmg2img + kvm group; wifi backup planned for flaky wired bridge; max_parallel raisable (huge capacity)"},
-    "omarchiMac": {"hardware": "i7-7700K, 31GB, AVX2", "avx2": true,  "max_parallel": 1, "assigned": [], "role": "coordinator + one AVX2 install", "status": "ready pending deps; single-VM by user request"},
-    "ugnomarchy": {"hardware": "i7-9750H laptop, 62GB, AVX2", "avx2": true, "max_parallel": 1, "assigned": ["mojave"], "role": "disposable worker (NOT infra)", "status": "installing mojave; paused at EULA"},
-    "Remac macOS configuration tool": {"avx2": null, "max_parallel": 1, "assigned": [], "status": "preflight pending"}
+    "og128x01": {
+      "hardware": "Mac Pro Xeon, 128GB, 24c, 1TB NVMe, headless, always-on",
+      "avx2": false,
+      "max_parallel": 1,
+      "assigned": [],
+      "role": "services (mirror+dashboard) + heavy pre-Ventura installs",
+      "status": "blocked: clone approval + docker + qemu/dmg2img + kvm group; wifi backup planned for flaky wired bridge; max_parallel raisable (huge capacity)"
+    },
+    "omarchiMac": {
+      "hardware": "i7-7700K, 31GB, AVX2",
+      "avx2": true,
+      "max_parallel": 1,
+      "assigned": [],
+      "role": "coordinator + one AVX2 install",
+      "status": "ready pending deps; single-VM by user request"
+    },
+    "ugnomarchy": {
+      "hardware": "i7-9750H laptop, 62GB, AVX2",
+      "avx2": true,
+      "max_parallel": 1,
+      "assigned": [
+        "mojave"
+      ],
+      "role": "disposable worker (NOT infra)",
+      "status": "installing mojave; paused at EULA"
+    },
+    "Remac macOS configuration tool": {
+      "avx2": null,
+      "max_parallel": 1,
+      "assigned": [],
+      "status": "preflight pending"
+    }
   },
   "notes": [
     "AVX2 hosts (omarchiMac, ugnomarchy) are the ONLY ones that can run Ventura/Sonoma/Sequoia/Tahoe.",
