@@ -10,3 +10,7 @@
 OVMF_VARS*.fd
 OpenCore-Catalina/EFI/OC/Resources/
 .direnv/
+
+# fleet tooling artifacts
+fleet/vms/
+fleet/golden/

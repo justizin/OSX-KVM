@@ -1,0 +1,16 @@
+{
+  "host": "ugnomarchy",
+  "probed_at": "2026-09-06T06:37:59-07:00",
+  "distro": "Omarchy",
+  "kernel": "7.1.9-arch1-2",
+  "cpu": {"model": "Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz", "vendor": "GenuineIntel", "cores": 6, "threads": 12,
+          "virt": "vmx", "avx2": true, "sse4_2": true},
+  "kvm": {"device": true, "rw": true, "ignore_msrs": "Y"},
+  "qemu": {"path": "/usr/bin/qemu-system-x86_64", "version": "11.1.0", "meets_min": true},
+  "dmg2img": "/usr/bin/dmg2img",
+  "mem_gb": 62,
+  "disk_free_gb": 846,
+  "max_concurrent_vms": 6,
+  "blockers": [],
+  "versions": [{"key":"high-sierra","name":"High Sierra (10.13)","cpu":"Penryn","gate":"sse4_2","supported":true,"reason":"ok"},{"key":"mojave","name":"Mojave (10.14)","cpu":"Penryn","gate":"sse4_2","supported":true,"reason":"ok"},{"key":"catalina","name":"Catalina (10.15)","cpu":"Penryn","gate":"sse4_2","supported":true,"reason":"ok"},{"key":"big-sur","name":"Big Sur (11)","cpu":"Penryn","gate":"sse4_2","supported":true,"reason":"ok"},{"key":"monterey","name":"Monterey (12)","cpu":"Penryn","gate":"sse4_2","supported":true,"reason":"ok"},{"key":"ventura","name":"Ventura (13)","cpu":"Skylake-Client,-hle,-rtm","gate":"avx2","supported":true,"reason":"ok"},{"key":"sonoma","name":"Sonoma (14)","cpu":"Skylake-Client,-hle,-rtm","gate":"avx2","supported":true,"reason":"ok"},{"key":"sequoia","name":"Sequoia (15)","cpu":"Skylake-Client,-hle,-rtm","gate":"avx2","supported":true,"reason":"ok"},{"key":"tahoe","name":"Tahoe (26)","cpu":"Skylake-Client,-hle,-rtm","gate":"avx2","supported":true,"reason":"ok"}]
+}
