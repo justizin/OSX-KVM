@@ -1,0 +1,65 @@
+{
+  "big-sur": {
+    "dmg_bytes": 668153735,
+    "dmg_sha256": "03013dd649716b6f3f6581bbdaf3aca8a6da96c5b89daf4e9b0a30445b55d6d5",
+    "fetched": "2026-09-07T20:18:14+00:00",
+    "product": "694-35959",
+    "shortname": "big-sur"
+  },
+  "catalina": {
+    "dmg_bytes": 498626206,
+    "dmg_sha256": "16d25e469399880002045c46ce0b032711984782ef4de21073aac8b230274399",
+    "fetched": "2026-09-07T20:17:57+00:00",
+    "product": "2Z694-25616",
+    "shortname": "catalina"
+  },
+  "high-sierra": {
+    "dmg_bytes": 486219126,
+    "dmg_sha256": "34c21af3049424ae1270dd78a620a8b210bef3e636e99b5dc2924e02195a665d",
+    "fetched": "2026-09-07T20:17:33+00:00",
+    "product": "091-63921",
+    "shortname": "high-sierra"
+  },
+  "mojave": {
+    "dmg_bytes": 480292242,
+    "dmg_sha256": "ee3ff99ca59b027a6778311dc12f868b08f16c9aae948ab1e7f85a4745d39815",
+    "fetched": "2026-09-07T20:17:45+00:00",
+    "product": "041-94410",
+    "shortname": "mojave"
+  },
+  "monterey": {
+    "dmg_bytes": 653762802,
+    "dmg_sha256": "15c10f3919cec6677dd88461740bb49861be110e93e73929d4f6e2097f5935a0",
+    "fetched": "2026-09-07T20:18:29+00:00",
+    "product": "012-40515",
+    "shortname": "monterey"
+  },
+  "sequoia": {
+    "dmg_bytes": 884317790,
+    "dmg_sha256": "7314eb401f5e84087f621b3599f0ad21ca3cdcc2685ea2da7f76806792328e20",
+    "fetched": "2026-09-07T20:19:07+00:00",
+    "product": "696-28424",
+    "shortname": "sequoia"
+  },
+  "sonoma": {
+    "dmg_bytes": 789568598,
+    "dmg_sha256": "591f07a9a4a58d855a2e53b86a5f5da854a250000a66a9382adaf106c20f839b",
+    "fetched": "2026-09-07T20:16:08+00:00",
+    "product": "696-08090",
+    "shortname": "sonoma"
+  },
+  "tahoe": {
+    "dmg_bytes": 960530321,
+    "dmg_sha256": "edddd0d5869caaa12e29e6996a04f11590280580976a119dbd42c24fa62fe18e",
+    "fetched": "2026-09-07T20:19:28+00:00",
+    "product": "140-93589",
+    "shortname": "tahoe"
+  },
+  "ventura": {
+    "dmg_bytes": 710918897,
+    "dmg_sha256": "c19bd12f5cb1651b87b74d04f02a636da762ea46b81c7ebc9f205fa2a976d599",
+    "fetched": "2026-09-07T20:18:44+00:00",
+    "product": "042-23155",
+    "shortname": "ventura"
+  }
+}
