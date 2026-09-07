@@ -1,0 +1,19 @@
+{
+  "host": "og128x01",
+  "probed_at": "2026-09-07",
+  "source": "hand-gathered by peer session (its git clone was blocked by that session's permission classifier; not from fleet/preflight.sh)",
+  "official": false,
+  "distro": "Debian GNU/Linux 13 (trixie)",
+  "kernel": "6.12.107+deb13-amd64",
+  "cpu": {"model": "Intel Xeon E5-2697 v2 (Ivy Bridge)", "cores": 12, "threads": 24,
+          "virt": "vmx", "avx2": false, "sse4_2": true},
+  "kvm": {"device": true, "user_in_kvm_group": false, "has_sudo": true, "ignore_msrs": "unknown"},
+  "mem_gb": 125,
+  "disk_free_gb": 719,
+  "tailscale": "100.90.170.92",
+  "eligible_versions": ["high-sierra", "mojave", "catalina", "big-sur", "monterey"],
+  "ineligible": ["ventura", "sonoma", "sequoia", "tahoe"],
+  "reason_ineligible": "no AVX2",
+  "capacity_note": "125 GB RAM / 719 GB free -> comfortably several parallel installs; a primary worker",
+  "blockers": ["git clone not yet approved on that session", "qemu-system-x86 + dmg2img not installed", "user not in kvm group", "ignore_msrs not confirmed"]
+}
