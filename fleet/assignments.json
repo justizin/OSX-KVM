@@ -36,12 +36,10 @@
     "ugnomarchy": {
       "hardware": "i7-9750H laptop, 62GB, AVX2",
       "avx2": true,
-      "max_parallel": 1,
-      "assigned": [
-        "mojave"
-      ],
-      "role": "disposable worker (NOT infra)",
-      "status": "installing mojave; paused at EULA"
+      "max_parallel": 0,
+      "assigned": [],
+      "role": "RETIRED as a worker (laptop). Only serves the Mojave template parts on :8080 until og128x01 has pulled them.",
+      "status": "no further installs; Mojave done, High Sierra attempted here by mistake (blocked Apple-side anyway)"
     },
     "Remac macOS configuration tool": {
       "avx2": null,
@@ -53,6 +51,7 @@
   "notes": [
     "AVX2 hosts (omarchiMac, ugnomarchy) are the ONLY ones that can run Ventura/Sonoma/Sequoia/Tahoe.",
     "og128x01 (no AVX2) takes High Sierra..Monterey; its capacity makes it the parallel workhorse for those.",
-    "EULA acceptance is a human gate on every install unless the user authorizes agents to click Agree."
+    "EULA acceptance is a human gate on every install unless the user authorizes agents to click Agree.",
+    "2026-09-07: user rule -- NO installs/services on ugnomarchy. Pre-Ventura -> og128x01; Ventura+ -> omarchiMac."
   ]
 }
