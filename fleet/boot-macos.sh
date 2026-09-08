@@ -6,6 +6,7 @@
 #   ./boot-macos.sh mojave            # run (no install media attached)
 #   ./boot-macos.sh mojave --install   # attach BaseSystem.img and boot to it
 #   ./boot-macos.sh mojave --headless  # no window; VNC on 127.0.0.1:<offset>
+#   VM_NAME=mojave-media PORT_OFFSET=20 ./boot-macos.sh mojave   # 2nd Mojave on the same host
 #
 # Env overrides: OSX_KVM (upstream checkout), FLEET_ROOT, RAM_MB, CORES, THREADS
 set -euo pipefail
@@ -42,19 +43,26 @@ CPU_MODEL="$(version_field "$VERSION" 4)"
 NIC="$(version_field "$VERSION" 5)"
 NAME="$(version_field "$VERSION" 2)"
 
-VM_DIR="$FLEET_ROOT/vms/$VERSION"
+# Instance name: defaults to the version, but a SECOND VM of the same version on
+# one host (e.g. an ISO-build VM beside an install VM) needs its own name and
+# port block. Everything mutable is keyed by VM_NAME; vmctl/record/measure/
+# health/publish take the same name as their first argument.
+VM_NAME="${VM_NAME:-$VERSION}"
+VM_DIR="$FLEET_ROOT/vms/$VM_NAME"
 RUN_DIR="${XDG_RUNTIME_DIR:-/tmp}"
-MON_SOCK="$RUN_DIR/osx-$VERSION-mon.sock"
-QMP_SOCK="$RUN_DIR/osx-$VERSION-qmp.sock"
+MON_SOCK="$RUN_DIR/osx-$VM_NAME-mon.sock"
+QMP_SOCK="$RUN_DIR/osx-$VM_NAME-qmp.sock"
 
-# stable per-version port offset so several VMs coexist
+# port block: default = this version's index in versions.sh; override with
+# PORT_OFFSET (e.g. 20) for an extra instance so SSH/VNC/WS ports don't collide
 OFFSET=0; i=0
 while read -r k; do [ "$k" = "$VERSION" ] && OFFSET=$i; i=$((i+1)); done < <(version_keys)
+OFFSET="${PORT_OFFSET:-$OFFSET}"
 SSH_PORT=$((2222 + OFFSET))
 VNC_DISP=$((10 + OFFSET))
 
 [ -d "$OSX_KVM" ] || { echo "OSX-KVM checkout not found at $OSX_KVM (set OSX_KVM=)" >&2; exit 1; }
-[ -f "$VM_DIR/mac_hdd_ng.img" ] || { echo "no disk at $VM_DIR/mac_hdd_ng.img -- run ./provision.sh $VERSION first" >&2; exit 1; }
+[ -f "$VM_DIR/mac_hdd_ng.img" ] || { echo "no disk at $VM_DIR/mac_hdd_ng.img -- run VM_NAME=$VM_NAME ./provision.sh $VERSION first" >&2; exit 1; }
 
 # Per-VM NVRAM. Upstream points every VM at the repo's single OVMF_VARS file;
 # two VMs sharing it will clobber each other's boot entries.
@@ -126,7 +134,7 @@ VEOF
 fi
 
 rm -f "$MON_SOCK" "$QMP_SOCK"
-echo "== $NAME ($VERSION)"
+echo "== $NAME ($VERSION) instance=$VM_NAME offset=$OFFSET"
 echo "   cpu=$CPU_MODEL  ram=${RAM_MB}M  smp=$THREADS(${CORES}c)  nic=$NIC"
 echo "   disk=$VM_DIR/mac_hdd_ng.img"
 echo "   ssh=localhost:$SSH_PORT  qmp=$QMP_SOCK$( $HEADLESS && echo "  vnc-ws=$VNC_BIND:$WS_PORT (novnc)  rfb=$VNC_BIND:$((5900+VNC_DISP))" )"

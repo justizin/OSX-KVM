@@ -276,8 +276,11 @@ Rules that keep it collision-free as the fleet grows:
    VMs. Never point two agents at the same clone -- they race on the working tree
    and on git. If a host must run two agents, give each its own `OSX_KVM=<dir>`
    and `FLEET_ROOT=<dir>` so no path is shared.
-2. **Never run two installs of the SAME version on one host** -- they share
-   `vms/<version>/`, sockets and ports. Different versions in parallel are fine.
+2. **Two VMs of the SAME version on one host need distinct instance names.**
+   By default everything is keyed by version; a second instance (e.g. a Mojave
+   ISO-build VM beside a Mojave install) must set `VM_NAME=<instance>` and a
+   `PORT_OFFSET` (>=20) for both `provision.sh` and `boot-macos.sh`, then pass
+   the instance name to vmctl (`VM=<instance>`), record/measure/health/publish.
 3. **Results go to a per-host branch `results/<host>`** (or are reported to the
    coordinator). Workers never push to `main`; the coordinator is its only writer
    and merges each host's results in. This removes all distributed-write races.

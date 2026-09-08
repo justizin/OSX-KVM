@@ -19,7 +19,8 @@ version_exists "$VERSION" || { echo "unknown version '$VERSION'" >&2; exit 2; }
 
 SHORT="$(version_field "$VERSION" 3)"
 NAME="$(version_field "$VERSION" 2)"
-VM_DIR="$FLEET_ROOT/vms/$VERSION"
+VM_NAME="${VM_NAME:-$VERSION}"
+VM_DIR="$FLEET_ROOT/vms/$VM_NAME"      # VM_NAME=<instance> for a second copy of a version
 mkdir -p "$VM_DIR"
 
 command -v dmg2img >/dev/null || { echo "dmg2img missing" >&2; exit 1; }
@@ -53,5 +54,5 @@ if [ ! -f "$VM_DIR/OVMF_VARS.fd" ]; then
   cp "$OSX_KVM/OVMF_VARS-1920x1080.fd" "$VM_DIR/OVMF_VARS.fd"
 fi
 
-echo "== ready. next: $HERE/boot-macos.sh $VERSION --install"
+echo "== ready. next: VM_NAME=$VM_NAME $HERE/boot-macos.sh $VERSION --install"
 ls -lh "$VM_DIR"
