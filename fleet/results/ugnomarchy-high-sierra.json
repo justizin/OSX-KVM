@@ -1,0 +1,15 @@
+{
+  "host": "ugnomarchy",
+  "hardware": "Intel i7-9750H (Coffee Lake) laptop, 62 GB RAM, NVMe",
+  "version": "high-sierra",
+  "outcome": "blocked-upstream",
+  "blocker": "Apple's recovery service no longer serves the 10.13 installer: 'The recovery server could not be contacted' at the installer splash, twice, with a fully working guest network.",
+  "config_validated": {"cpu_model": "Penryn", "smp": "4,cores=2", "ram_mb": 8192, "nic": "vmxnet3", "hid_bus": "ehci (USB 2.0)", "display": "headless, VNC ws :5700 / rfb :5910",
+                       "works": "OpenCore picker, Recovery (macOS Utilities), Disk Utility erase (Mac OS Extended Journaled, GUID), keyboard+mouse over QMP, Terminal"},
+  "evidence": {"guest_clock": "Tue Sep 8 00:46:23 UTC 2026 (correct)", "en0": "UP/RUNNING vmxnet3 52:54:00:c9:18:27, 10.0.2.15 via DHCP",
+               "ping_17.253.144.10": "2/2, 0% loss, ~20ms", "dns": "osrecovery.apple.com -> osrecovery.swu-apple.com.akadns.net (17.156.129.133)"},
+  "timeline": {"boot": "2026-09-07T17:36", "recovery": "17:38:45", "disk_erased": "17:42", "first_error": "17:44:5x", "retry_stalled": "17:48"},
+  "next_route": "Offline install media: obtain the full 'Install macOS High Sierra' (10.13.6) app from Apple's software catalog, build an ISO with createinstallmedia (repo ships OpenCore/create_iso_catalina.sh as the pattern), boot it with OpenCore-Boot-CD.sh. Requires a running macOS VM (e.g. the Sonoma workstation image) to run createinstallmedia.",
+  "notes": ["Contrast with Mojave on the same host: identical config succeeded end to end; the difference is purely which installers Apple still serves to Recovery.",
+            "High Sierra recovery boot was slower to draw the OpenCore picker (>15s) than newer versions; a keypress sent to a black screen still took effect."]
+}
