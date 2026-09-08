@@ -18,9 +18,11 @@
       "hardware": "Mac Pro Xeon, 128GB, 24c, 1TB NVMe, headless, always-on",
       "avx2": false,
       "max_parallel": 1,
-      "assigned": [],
+      "assigned": [
+        "mojave"
+      ],
       "role": "services (mirror+dashboard) + heavy pre-Ventura installs",
-      "status": "services up (interim :8090/:8080); installs blocked until root installs qemu-system-x86/dmg2img and sets ignore_msrs",
+      "status": "services up (interim :8090/:8080); mojave assigned: fresh install from scratch for the cross-host matrix, staged, waiting on root (qemu-system-x86, dmg2img, ignore_msrs)",
       "checkout_layout": "~/src/claude/OSX-KVM (services) + ~/Work/funtime/<version>/OSX-KVM per attempt"
     },
     "omarchiMac": {
