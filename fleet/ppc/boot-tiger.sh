@@ -37,13 +37,15 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-VM_DIR="${VM_DIR:-$HERE/vm}"
+FLEET_ROOT="${FLEET_ROOT:-$(cd "$HERE/.." && pwd)}"
+VM_DIR="${VM_DIR:-$FLEET_ROOT/vms/tiger}"   # fleet layout: record.sh/measure.sh/publish.sh find it as VM=tiger
 DISK="$VM_DIR/tiger.qcow2"
 DISK_SIZE="${DISK_SIZE:-32G}"
 RAM_MB="${RAM_MB:-1024}"     # OS X PPC tops out around 2 GiB; 1-1.5 GiB is safe
 CPU="${CPU:-g3}"             # g3 = no AltiVec (matches the dual G3). g4 = TiBook.
 RES="${RES:-1024x768x32}"
 RUN_DIR="${XDG_RUNTIME_DIR:-/tmp}"
+HEADLESS=false; VNC_BIND="${VNC_BIND:-127.0.0.1}"
 
 command -v qemu-system-ppc >/dev/null || {
   echo "qemu-system-ppc not installed." >&2
@@ -57,6 +59,7 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --install) INSTALL=true; ISO="${2:-}"; shift 2 ;;
     --cpu)     CPU="$2"; shift 2 ;;
+    --headless) HEADLESS=true; shift ;;
     *) echo "unknown arg $1" >&2; exit 2 ;;
   esac
 done
@@ -76,9 +79,15 @@ args=(
   -device "ide-hd,drive=hd,bus=ide.0"
   -netdev user,id=net0
   -device sungem,netdev=net0
-  -monitor "unix:$RUN_DIR/tiger-mon.sock,server,nowait"
-  -qmp "unix:$RUN_DIR/tiger-qmp.sock,server,nowait"
+  -monitor "unix:$RUN_DIR/osx-tiger-mon.sock,server,nowait"
+  -qmp "unix:$RUN_DIR/osx-tiger-qmp.sock,server,nowait"
+  -serial "file:$VM_DIR/serial.log"          # Tiger console/kernel output for validation logs
 )
+if $HEADLESS; then
+  # same convention as boot-macos.sh: RFB + WebSocket for the dashboard's noVNC (tiger = offset 9)
+  args+=( -display none -vnc "$VNC_BIND:19,websocket=5709" )
+  printf 'VNC_BIND=%s\nVNC_WS_PORT=5709\nVNC_RFB_PORT=5919\n' "$VNC_BIND" > "$VM_DIR/vnc.env"
+fi
 
 if $INSTALL; then
   [ -n "$ISO" ] && [ -f "$ISO" ] || { echo "--install needs a readable Tiger ISO/DMG path" >&2; exit 1; }
